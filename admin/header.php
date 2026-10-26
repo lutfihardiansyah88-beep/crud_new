@@ -1,41 +1,76 @@
 <?php
 // admin/header.php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Cek apakah user sudah login, jika belum arahkan ke halaman login
+// Panggil koneksi database
+require_once __DIR__ . '/../config/koneksi.php';
+
+// Cek autentikasi login
 if (!isset($_SESSION['login'])) {
     header("Location: ../auth/login.php");
     exit;
 }
+
+$current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Aplikasi CBA Sederhana</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem CBA - Manajemen Data</title>
+    <!-- Bootstrap 5 CSS Lokal -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #fdfdfd;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-content {
+            flex: 1;
+        }
+        .navbar-brand {
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
 
-    <!-- Header Judul -->
-    <h2>PANEL ADMINISTRATOR - SISTEM CBA</h2>
-    <hr>
+    <!-- Navbar Sederhana Tanpa Icon -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="dashboard.php">SISTEM CBA</a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-    <!-- Struktur Layout Tabel: Navbar Kiri dan Konten Kanan (Tanpa CSS Rumit) -->
-    <table border="1" cellpadding="10" cellspacing="0" width="100%">
-        <tr>
-            <!-- Kolom Navigasi Kiri -->
-            <td width="220" valign="top">
-                <h3>Navigasi</h3>
-                <p>Login sebagai: <br><b><?= htmlspecialchars($_SESSION['nama_lengkap']); ?></b> (<?= htmlspecialchars($_SESSION['username']); ?>)</p>
-                <hr>
-                <ul>
-                    <li><a href="dashboard.php">Dashboard</a></li>
-                    <li><a href="siswa.php">Data Siswa (JOIN)</a></li>
-                    <li><a href="jurusan.php">Data Jurusan</a></li>
-                    <br>
-                    <li><a href="../auth/logout.php" onclick="return confirm('Apakah Anda yakin ingin logout?');">Logout</a></li>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link <?= ($current_page == 'dashboard.php') ? 'active fw-bold' : ''; ?>" href="dashboard.php">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?= ($current_page == 'siswa.php') ? 'active fw-bold' : ''; ?>" href="siswa.php">Data Siswa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link <?= ($current_page == 'jurusan.php') ? 'active fw-bold' : ''; ?>" href="jurusan.php">Data Jurusan</a>
+                    </li>
                 </ul>
-            </td>
 
-            <!-- Kolom Konten Kanan -->
-            <td valign="top">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-light small">
+                        Login: <b><?= htmlspecialchars($_SESSION['nama_lengkap'] ?? 'Admin'); ?></b>
+                    </span>
+                    <a href="../auth/logout.php" class="btn btn-outline-light btn-sm" onclick="return confirm('Apakah Anda yakin ingin logout?');">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Kontainer Konten Utama -->
+    <main class="container main-content pb-4">
