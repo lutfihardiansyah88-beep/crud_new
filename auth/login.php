@@ -30,6 +30,7 @@ if (isset($_POST['btn_login'])) {
             $_SESSION['login'] = true;
             $_SESSION['username'] = $data['username'];
             $_SESSION['nama_lengkap'] = $data['nama_lengkap'];
+            $_SESSION['role'] = $data['role'] ?? 'petugas';
 
             header("Location: ../admin/dashboard.php");
             exit;
@@ -41,6 +42,7 @@ if (isset($_POST['btn_login'])) {
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -55,14 +57,15 @@ if (isset($_POST['btn_login'])) {
             align-items: center;
             justify-content: center;
         }
+
         .login-box {
             width: 100%;
             max-width: 400px;
         }
     </style>
 </head>
-<body>
 
+<body>
     <div class="container py-4">
         <div class="row justify-content-center">
             <div class="login-box">
@@ -80,15 +83,16 @@ if (isset($_POST['btn_login'])) {
                         <form action="" method="POST">
                             <div class="mb-3">
                                 <label for="username" class="form-label small">Username</label>
-                                <input type="text" name="username" id="username" class="form-control" 
-                                       placeholder="Username" 
-                                       value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>" required>
+                                <input type="text" name="username" id="username" class="form-control"
+                                    placeholder="Username"
+                                    value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>"
+                                    required>
                             </div>
 
                             <div class="mb-3">
                                 <label for="password" class="form-label small">Password</label>
-                                <input type="password" name="password" id="password" class="form-control" 
-                                       placeholder="Password" required>
+                                <input type="password" name="password" id="password" class="form-control"
+                                    placeholder="Password" required>
                             </div>
 
                             <button type="submit" name="btn_login" class="btn btn-primary w-100">
@@ -97,7 +101,7 @@ if (isset($_POST['btn_login'])) {
                         </form>
 
                         <div class="mt-3 text-center text-muted small border-top pt-2">
-                            Default: <b>admin</b> / <b>123</b>
+                            Admin: <b>admin</b> / <b>123</b> &bull; Petugas: <b>petugas</b> / <b>123</b>
                         </div>
                     </div>
                 </div>
@@ -108,4 +112,5 @@ if (isset($_POST['btn_login'])) {
     <!-- Bootstrap 5 Bundle JS -->
     <script src="../js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

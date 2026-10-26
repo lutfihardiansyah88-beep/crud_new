@@ -2,18 +2,27 @@
 CREATE DATABASE IF NOT EXISTS db_cba_crud;
 USE db_cba_crud;
 
--- 1. Tabel Users untuk Login
+-- 1. Tabel Users untuk Login & Role Hak Akses
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    nama_lengkap VARCHAR(100) NOT NULL
+    nama_lengkap VARCHAR(100) NOT NULL,
+    role ENUM('admin', 'user') NOT NULL DEFAULT 'user'
 );
 
--- Masukkan data user awal (Username: admin, Password: 123)
--- Kita gunakan md5('123') = 202cb962ac59075b964b07152d234b70
-INSERT INTO users (username, password, nama_lengkap) VALUES 
-('admin', MD5('123'), 'Administrator');
+-- Masukkan data user awal:
+-- 1. Admin   -> Username: admin,   Password: 123, Role: admin
+-- 2. user -> Username: user, Password: 123, Role: user
+INSERT INTO users (username, password, nama_lengkap, role) VALUES 
+('admin', MD5('123'), 'Administrator', 'admin'),
+('user', MD5('123'), 'user Data', 'user');
+
+-- Catatan Migrasi: Jika database dan tabel users sudah ada sebelumnya,
+-- cukup jalankan perintah ALTER TABLE berikut di phpMyAdmin / SQL console:
+-- ALTER TABLE users ADD COLUMN role ENUM('admin', 'user') NOT NULL DEFAULT 'user' AFTER nama_lengkap;
+-- UPDATE users SET role = 'admin' WHERE username = 'admin';
+-- INSERT INTO users (username, password, nama_lengkap, role) VALUES ('user', MD5('123'), 'user Data', 'user');
 
 -- 2. Tabel Jurusan (Tabel Induk / Relasi)
 CREATE TABLE IF NOT EXISTS jurusan (

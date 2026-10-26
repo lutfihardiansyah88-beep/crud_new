@@ -11,6 +11,14 @@ if (!isset($_SESSION['login'])) {
     exit;
 }
 
+/*
+ CONTOH PROTEKSI HALAMAN: Hanya Admin yang boleh mengakses Data Jurusan
+if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
+    header("Location: dashboard.php");
+    exit;
+}
+*/
+
 // =========================================================================
 // 1. PROSES TAMBAH JURUSAN (MODAL CREATE)
 // =========================================================================
@@ -19,20 +27,20 @@ if (isset($_POST['btn_tambah_jurusan'])) {
 
     if (empty($nama_jurusan)) {
         $_SESSION['flash_pesan'] = "Nama jurusan tidak boleh kosong!";
-        $_SESSION['flash_tipe']  = "danger";
+        $_SESSION['flash_tipe'] = "danger";
     } else {
         $cek = mysqli_query($koneksi, "SELECT * FROM jurusan WHERE nama_jurusan = '$nama_jurusan'");
         if (mysqli_num_rows($cek) > 0) {
             $_SESSION['flash_pesan'] = "Jurusan '$nama_jurusan' sudah terdaftar!";
-            $_SESSION['flash_tipe']  = "danger";
+            $_SESSION['flash_tipe'] = "danger";
         } else {
             $simpan = mysqli_query($koneksi, "INSERT INTO jurusan (nama_jurusan) VALUES ('$nama_jurusan')");
             if ($simpan) {
                 $_SESSION['flash_pesan'] = "Jurusan baru berhasil ditambahkan!";
-                $_SESSION['flash_tipe']  = "success";
+                $_SESSION['flash_tipe'] = "success";
             } else {
                 $_SESSION['flash_pesan'] = "Gagal menyimpan jurusan: " . mysqli_error($koneksi);
-                $_SESSION['flash_tipe']  = "danger";
+                $_SESSION['flash_tipe'] = "danger";
             }
         }
     }
@@ -45,25 +53,25 @@ if (isset($_POST['btn_tambah_jurusan'])) {
 // 2. PROSES UPDATE JURUSAN (MODAL EDIT)
 // =========================================================================
 if (isset($_POST['btn_edit_jurusan'])) {
-    $id_jurusan   = (int)$_POST['id_jurusan'];
+    $id_jurusan = (int) $_POST['id_jurusan'];
     $nama_jurusan = trim($_POST['nama_jurusan']);
 
     if (empty($nama_jurusan)) {
         $_SESSION['flash_pesan'] = "Nama jurusan tidak boleh kosong!";
-        $_SESSION['flash_tipe']  = "danger";
+        $_SESSION['flash_tipe'] = "danger";
     } else {
         $cek = mysqli_query($koneksi, "SELECT * FROM jurusan WHERE nama_jurusan = '$nama_jurusan' AND id_jurusan != '$id_jurusan'");
         if (mysqli_num_rows($cek) > 0) {
             $_SESSION['flash_pesan'] = "Nama jurusan '$nama_jurusan' sudah digunakan!";
-            $_SESSION['flash_tipe']  = "danger";
+            $_SESSION['flash_tipe'] = "danger";
         } else {
             $update = mysqli_query($koneksi, "UPDATE jurusan SET nama_jurusan = '$nama_jurusan' WHERE id_jurusan = '$id_jurusan'");
             if ($update) {
                 $_SESSION['flash_pesan'] = "Data jurusan berhasil diperbarui!";
-                $_SESSION['flash_tipe']  = "success";
+                $_SESSION['flash_tipe'] = "success";
             } else {
                 $_SESSION['flash_pesan'] = "Gagal memperbarui jurusan: " . mysqli_error($koneksi);
-                $_SESSION['flash_tipe']  = "danger";
+                $_SESSION['flash_tipe'] = "danger";
             }
         }
     }
@@ -76,14 +84,14 @@ if (isset($_POST['btn_edit_jurusan'])) {
 // 3. PROSES HAPUS JURUSAN (MODAL DELETE)
 // =========================================================================
 if (isset($_GET['aksi']) && $_GET['aksi'] == 'hapus' && isset($_GET['id'])) {
-    $id_jurusan = (int)$_GET['id'];
+    $id_jurusan = (int) $_GET['id'];
     $hapus = mysqli_query($koneksi, "DELETE FROM jurusan WHERE id_jurusan = '$id_jurusan'");
     if ($hapus) {
         $_SESSION['flash_pesan'] = "Jurusan berhasil dihapus!";
-        $_SESSION['flash_tipe']  = "success";
+        $_SESSION['flash_tipe'] = "success";
     } else {
         $_SESSION['flash_pesan'] = "Gagal menghapus jurusan: " . mysqli_error($koneksi);
-        $_SESSION['flash_tipe']  = "danger";
+        $_SESSION['flash_tipe'] = "danger";
     }
 
     header("Location: jurusan.php");
@@ -156,33 +164,31 @@ require_once 'header.php';
             </tr>
         </thead>
         <tbody>
-            <?php 
+            <?php
             $no = 1;
             if (count($jurusan_list) > 0):
-                foreach ($jurusan_list as $row): 
-            ?>
-                <tr>
-                    <td class="text-center"><?= $no++; ?></td>
-                    <td><?= $row['id_jurusan']; ?></td>
-                    <td><b><?= htmlspecialchars($row['nama_jurusan']); ?></b></td>
-                    <td><?= $row['total_siswa']; ?> Siswa</td>
-                    <td class="text-center">
-                        <button type="button" class="btn btn-warning btn-sm" 
-                                data-bs-toggle="modal" 
+                foreach ($jurusan_list as $row):
+                    ?>
+                    <tr>
+                        <td class="text-center"><?= $no++; ?></td>
+                        <td><?= $row['id_jurusan']; ?></td>
+                        <td><b><?= htmlspecialchars($row['nama_jurusan']); ?></b></td>
+                        <td><?= $row['total_siswa']; ?> Siswa</td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
                                 data-bs-target="#modalEditJurusan<?= $row['id_jurusan']; ?>">
-                            Edit
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm" 
-                                data-bs-toggle="modal" 
+                                Edit
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                 data-bs-target="#modalHapusJurusan<?= $row['id_jurusan']; ?>">
-                            Hapus
-                        </button>
-                    </td>
-                </tr>
-            <?php 
+                                Hapus
+                            </button>
+                        </td>
+                    </tr>
+                <?php
                 endforeach;
-            else: 
-            ?>
+            else:
+                ?>
                 <tr>
                     <td colspan="5" class="text-center text-muted py-3">Belum ada data jurusan.</td>
                 </tr>
@@ -235,7 +241,8 @@ require_once 'header.php';
                         <input type="hidden" name="id_jurusan" value="<?= $row['id_jurusan']; ?>">
                         <div class="mb-3">
                             <label class="form-label">Nama Jurusan</label>
-                            <input type="text" name="nama_jurusan" class="form-control" value="<?= htmlspecialchars($row['nama_jurusan']); ?>" required>
+                            <input type="text" name="nama_jurusan" class="form-control"
+                                value="<?= htmlspecialchars($row['nama_jurusan']); ?>" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -257,7 +264,8 @@ require_once 'header.php';
                 </div>
                 <div class="modal-body">
                     <p>Apakah Anda yakin ingin menghapus jurusan: <b><?= htmlspecialchars($row['nama_jurusan']); ?></b>?</p>
-                    <p class="text-danger small mb-0">Catatan: Menghapus jurusan akan menghapus siswa di jurusan ini (CASCADE).</p>
+                    <p class="text-danger small mb-0">Catatan: Menghapus jurusan akan menghapus siswa di jurusan ini
+                        (CASCADE).</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

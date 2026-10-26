@@ -15,20 +15,30 @@ if (!isset($_SESSION['login'])) {
 // 1. PROSES TAMBAH SISWA (MODAL CREATE)
 // =========================================================================
 if (isset($_POST['btn_tambah_siswa'])) {
-    $nis           = trim($_POST['nis']);
-    $nama_siswa    = trim($_POST['nama_siswa']);
+    /* 
+    CONTOH PROTEKSI ROLE: Aktifkan jika ingin membatasi hanya admin yang boleh menambah
+    if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
+        $_SESSION['flash_pesan'] = "Akses ditolak! Hanya Admin yang boleh menambah siswa.";
+        $_SESSION['flash_tipe']  = "danger";
+        header("Location: siswa.php");
+        exit;
+    }
+    */
+
+    $nis = trim($_POST['nis']);
+    $nama_siswa = trim($_POST['nama_siswa']);
     $jenis_kelamin = isset($_POST['jenis_kelamin']) ? trim($_POST['jenis_kelamin']) : "";
-    $id_jurusan    = (int)$_POST['id_jurusan'];
-    $alamat        = trim($_POST['alamat']);
+    $id_jurusan = (int) $_POST['id_jurusan'];
+    $alamat = trim($_POST['alamat']);
 
     if (empty($nis) || empty($nama_siswa) || empty($jenis_kelamin) || empty($id_jurusan) || empty($alamat)) {
         $_SESSION['flash_pesan'] = "Semua form wajib diisi!";
-        $_SESSION['flash_tipe']  = "danger";
+        $_SESSION['flash_tipe'] = "danger";
     } else {
         $cek_nis = mysqli_query($koneksi, "SELECT * FROM siswa WHERE nis = '$nis'");
         if (mysqli_num_rows($cek_nis) > 0) {
             $_SESSION['flash_pesan'] = "NIS '$nis' sudah terdaftar! Gunakan NIS lain.";
-            $_SESSION['flash_tipe']  = "danger";
+            $_SESSION['flash_tipe'] = "danger";
         } else {
             $simpan = mysqli_query($koneksi, "
                 INSERT INTO siswa (nis, nama_siswa, jenis_kelamin, id_jurusan, alamat) 
@@ -37,10 +47,10 @@ if (isset($_POST['btn_tambah_siswa'])) {
 
             if ($simpan) {
                 $_SESSION['flash_pesan'] = "Data siswa berhasil ditambahkan!";
-                $_SESSION['flash_tipe']  = "success";
+                $_SESSION['flash_tipe'] = "success";
             } else {
                 $_SESSION['flash_pesan'] = "Gagal menambah data: " . mysqli_error($koneksi);
-                $_SESSION['flash_tipe']  = "danger";
+                $_SESSION['flash_tipe'] = "danger";
             }
         }
     }
@@ -53,21 +63,31 @@ if (isset($_POST['btn_tambah_siswa'])) {
 // 2. PROSES UPDATE SISWA (MODAL EDIT)
 // =========================================================================
 if (isset($_POST['btn_edit_siswa'])) {
-    $id_siswa      = (int)$_POST['id_siswa'];
-    $nis           = trim($_POST['nis']);
-    $nama_siswa    = trim($_POST['nama_siswa']);
+    /*
+     CONTOH PROTEKSI ROLE: Aktifkan jika ingin membatasi hanya admin yang boleh mengedit
+    if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
+        $_SESSION['flash_pesan'] = "Akses ditolak! Hanya Admin yang boleh mengubah data siswa.";
+        $_SESSION['flash_tipe']  = "danger";
+        header("Location: siswa.php");
+        exit;
+    }
+    */
+
+    $id_siswa = (int) $_POST['id_siswa'];
+    $nis = trim($_POST['nis']);
+    $nama_siswa = trim($_POST['nama_siswa']);
     $jenis_kelamin = isset($_POST['jenis_kelamin']) ? trim($_POST['jenis_kelamin']) : "";
-    $id_jurusan    = (int)$_POST['id_jurusan'];
-    $alamat        = trim($_POST['alamat']);
+    $id_jurusan = (int) $_POST['id_jurusan'];
+    $alamat = trim($_POST['alamat']);
 
     if (empty($nis) || empty($nama_siswa) || empty($jenis_kelamin) || empty($id_jurusan) || empty($alamat)) {
         $_SESSION['flash_pesan'] = "Semua form wajib diisi!";
-        $_SESSION['flash_tipe']  = "danger";
+        $_SESSION['flash_tipe'] = "danger";
     } else {
         $cek_nis = mysqli_query($koneksi, "SELECT * FROM siswa WHERE nis = '$nis' AND id_siswa != '$id_siswa'");
         if (mysqli_num_rows($cek_nis) > 0) {
             $_SESSION['flash_pesan'] = "NIS '$nis' sudah digunakan oleh siswa lain!";
-            $_SESSION['flash_tipe']  = "danger";
+            $_SESSION['flash_tipe'] = "danger";
         } else {
             $update = mysqli_query($koneksi, "
                 UPDATE siswa 
@@ -81,10 +101,10 @@ if (isset($_POST['btn_edit_siswa'])) {
 
             if ($update) {
                 $_SESSION['flash_pesan'] = "Data siswa berhasil diperbarui!";
-                $_SESSION['flash_tipe']  = "success";
+                $_SESSION['flash_tipe'] = "success";
             } else {
                 $_SESSION['flash_pesan'] = "Gagal memperbarui data: " . mysqli_error($koneksi);
-                $_SESSION['flash_tipe']  = "danger";
+                $_SESSION['flash_tipe'] = "danger";
             }
         }
     }
@@ -97,14 +117,24 @@ if (isset($_POST['btn_edit_siswa'])) {
 // 3. PROSES HAPUS SISWA (MODAL DELETE)
 // =========================================================================
 if (isset($_GET['aksi']) && $_GET['aksi'] == 'hapus' && isset($_GET['id'])) {
-    $id_hapus = (int)$_GET['id'];
+    /*
+     CONTOH PROTEKSI ROLE: Aktifkan jika ingin membatasi hanya admin yang boleh menghapus
+    if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
+        $_SESSION['flash_pesan'] = "Akses ditolak! Hanya Admin yang boleh menghapus data siswa.";
+        $_SESSION['flash_tipe']  = "danger";
+        header("Location: siswa.php");
+        exit;
+    }
+    */
+
+    $id_hapus = (int) $_GET['id'];
     $hapus = mysqli_query($koneksi, "DELETE FROM siswa WHERE id_siswa = '$id_hapus'");
     if ($hapus) {
         $_SESSION['flash_pesan'] = "Data siswa berhasil dihapus!";
-        $_SESSION['flash_tipe']  = "success";
+        $_SESSION['flash_tipe'] = "success";
     } else {
         $_SESSION['flash_pesan'] = "Gagal menghapus data: " . mysqli_error($koneksi);
-        $_SESSION['flash_tipe']  = "danger";
+        $_SESSION['flash_tipe'] = "danger";
     }
 
     header("Location: siswa.php");
@@ -156,9 +186,12 @@ require_once 'header.php';
 <!-- Baris Judul & Tombol Tambah -->
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="mb-0">Data Siswa</h4>
+    <!-- CONTOH ROLE: Jika tombol Tambah Siswa HANYA untuk Admin, aktifkan baris php di bawah (hapus /* dan */) -->
+    <?php /* if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin'): */ ?>
     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalTambah">
         + Tambah Siswa
     </button>
+    <?php /* endif; */ ?>
 </div>
 
 <!-- Alert Notifikasi -->
@@ -184,40 +217,42 @@ require_once 'header.php';
             </tr>
         </thead>
         <tbody>
-            <?php 
+            <?php
             $no = 1;
             if (count($siswa_list) > 0):
-                foreach ($siswa_list as $row): 
-            ?>
-                <tr>
-                    <td class="text-center"><?= $no++; ?></td>
-                    <td><?= htmlspecialchars($row['nis']); ?></td>
-                    <td><b><?= htmlspecialchars($row['nama_siswa']); ?></b></td>
-                    <td><?= htmlspecialchars($row['jenis_kelamin']); ?></td>
-                    <td><?= htmlspecialchars($row['nama_jurusan']); ?></td>
-                    <td><?= htmlspecialchars($row['alamat']); ?></td>
-                    <td class="text-center">
-                        <button type="button" class="btn btn-info btn-sm text-white" 
-                                data-bs-toggle="modal" 
+                foreach ($siswa_list as $row):
+                    ?>
+                    <tr>
+                        <td class="text-center"><?= $no++; ?></td>
+                        <td><?= htmlspecialchars($row['nis']); ?></td>
+                        <td><b><?= htmlspecialchars($row['nama_siswa']); ?></b></td>
+                        <td><?= htmlspecialchars($row['jenis_kelamin']); ?></td>
+                        <td><?= htmlspecialchars($row['nama_jurusan']); ?></td>
+                        <td><?= htmlspecialchars($row['alamat']); ?></td>
+                        <td class="text-center">
+                            <!-- 1. Tombol Detail dapat diakses oleh semua user -->
+                            <button type="button" class="btn btn-info btn-sm text-white" data-bs-toggle="modal"
                                 data-bs-target="#modalDetail<?= $row['id_siswa']; ?>">
-                            Detail
-                        </button>
-                        <button type="button" class="btn btn-warning btn-sm" 
-                                data-bs-toggle="modal" 
+                                Detail
+                            </button>
+
+                            <!-- 2. CONTOH ROLE: Jika tombol Edit & Hapus HANYA untuk Admin, aktifkan baris php di bawah (hapus /* dan */) -->
+                            <?php /* if (isset($_SESSION['role']) && $_SESSION['role'] == 'admin'): */ ?>
+                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal"
                                 data-bs-target="#modalEdit<?= $row['id_siswa']; ?>">
-                            Edit
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm" 
-                                data-bs-toggle="modal" 
+                                Edit
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                 data-bs-target="#modalHapus<?= $row['id_siswa']; ?>">
-                            Hapus
-                        </button>
-                    </td>
-                </tr>
-            <?php 
+                                Hapus
+                            </button>
+                            <?php /* endif; */ ?>
+                        </td>
+                    </tr>
+                <?php
                 endforeach;
-            else: 
-            ?>
+            else:
+                ?>
                 <tr>
                     <td colspan="7" class="text-center text-muted py-3">Belum ada data siswa.</td>
                 </tr>
@@ -251,11 +286,13 @@ require_once 'header.php';
                     <div class="mb-3">
                         <label class="form-label d-block">Jenis Kelamin</label>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="jenis_kelamin" id="tambah_jk_l" value="Laki-laki" checked>
+                            <input class="form-check-input" type="radio" name="jenis_kelamin" id="tambah_jk_l"
+                                value="Laki-laki" checked>
                             <label class="form-check-label" for="tambah_jk_l">Laki-laki</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="jenis_kelamin" id="tambah_jk_p" value="Perempuan">
+                            <input class="form-check-input" type="radio" name="jenis_kelamin" id="tambah_jk_p"
+                                value="Perempuan">
                             <label class="form-check-label" for="tambah_jk_p">Perempuan</label>
                         </div>
                     </div>
@@ -264,13 +301,15 @@ require_once 'header.php';
                         <select name="id_jurusan" class="form-select" required>
                             <option value="">-- Pilih Jurusan --</option>
                             <?php foreach ($jurusan_array as $jur): ?>
-                                <option value="<?= $jur['id_jurusan']; ?>"><?= htmlspecialchars($jur['nama_jurusan']); ?></option>
+                                <option value="<?= $jur['id_jurusan']; ?>"><?= htmlspecialchars($jur['nama_jurusan']); ?>
+                                </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Alamat</label>
-                        <textarea name="alamat" class="form-control" rows="3" placeholder="Alamat lengkap siswa" required></textarea>
+                        <textarea name="alamat" class="form-control" rows="3" placeholder="Alamat lengkap siswa"
+                            required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -285,7 +324,7 @@ require_once 'header.php';
 <!-- 2. LOOP MODAL DETAIL, EDIT, HAPUS PER DATA -->
 <?php foreach ($siswa_list as $row): ?>
 
-    <!-- MODAL DETAIL -->
+    <!-- MODAL DETAIL (UNTUK SEMUA ROLE) -->
     <div class="modal fade" id="modalDetail<?= $row['id_siswa']; ?>" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -324,6 +363,7 @@ require_once 'header.php';
         </div>
     </div>
 
+    <!-- MODAL EDIT & HAPUS -->
     <!-- MODAL EDIT -->
     <div class="modal fade" id="modalEdit<?= $row['id_siswa']; ?>" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -338,20 +378,26 @@ require_once 'header.php';
 
                         <div class="mb-3">
                             <label class="form-label">NIS</label>
-                            <input type="text" name="nis" class="form-control" value="<?= htmlspecialchars($row['nis']); ?>" required>
+                            <input type="text" name="nis" class="form-control" value="<?= htmlspecialchars($row['nis']); ?>"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Nama Siswa</label>
-                            <input type="text" name="nama_siswa" class="form-control" value="<?= htmlspecialchars($row['nama_siswa']); ?>" required>
+                            <input type="text" name="nama_siswa" class="form-control"
+                                value="<?= htmlspecialchars($row['nama_siswa']); ?>" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label d-block">Jenis Kelamin</label>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="jenis_kelamin" id="edit_jk_l_<?= $row['id_siswa']; ?>" value="Laki-laki" <?= ($row['jenis_kelamin'] == 'Laki-laki') ? 'checked' : ''; ?>>
+                                <input class="form-check-input" type="radio" name="jenis_kelamin"
+                                    id="edit_jk_l_<?= $row['id_siswa']; ?>" value="Laki-laki"
+                                    <?= ($row['jenis_kelamin'] == 'Laki-laki') ? 'checked' : ''; ?>>
                                 <label class="form-check-label" for="edit_jk_l_<?= $row['id_siswa']; ?>">Laki-laki</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="jenis_kelamin" id="edit_jk_p_<?= $row['id_siswa']; ?>" value="Perempuan" <?= ($row['jenis_kelamin'] == 'Perempuan') ? 'checked' : ''; ?>>
+                                <input class="form-check-input" type="radio" name="jenis_kelamin"
+                                    id="edit_jk_p_<?= $row['id_siswa']; ?>" value="Perempuan"
+                                    <?= ($row['jenis_kelamin'] == 'Perempuan') ? 'checked' : ''; ?>>
                                 <label class="form-check-label" for="edit_jk_p_<?= $row['id_siswa']; ?>">Perempuan</label>
                             </div>
                         </div>
@@ -368,7 +414,8 @@ require_once 'header.php';
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Alamat</label>
-                            <textarea name="alamat" class="form-control" rows="3" required><?= htmlspecialchars($row['alamat']); ?></textarea>
+                            <textarea name="alamat" class="form-control" rows="3"
+                                required><?= htmlspecialchars($row['alamat']); ?></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
